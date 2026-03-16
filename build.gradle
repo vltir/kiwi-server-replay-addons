@@ -21,11 +21,23 @@ loom {
 }
 
 repositories {
-    // Add repositories to retrieve artifacts from in here.
-    // You should only use this when depending on other mods because
-    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-    // for more information about repositories.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven {
+        url = uri("https://maven.supersanta.me/snapshots")
+    }
+    maven {
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+    }
 }
 
 dependencies {
@@ -35,6 +47,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modImplementation "maven.modrinth:server-replay:1.1.2+mc1.21"
+    modImplementation "net.fabricmc:fabric-language-kotlin:1.13.0+kotlin.2.1.0"
+    modImplementation "maven.modrinth:fabric-permissions-api:0.3.1"
+    include "maven.modrinth:fabric-permissions-api:0.3.1"
 }
 
 processResources {
