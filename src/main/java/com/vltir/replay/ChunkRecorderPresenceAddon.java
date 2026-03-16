@@ -4,11 +4,10 @@ import com.vltir.replay.mixin.ChunkRecorderAccessor;
 import me.senseiwells.replay.chunk.ChunkRecorder;
 import me.senseiwells.replay.chunk.ChunkRecorders;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Automatically pauses and resumes chunk area recordings based on whether any
@@ -34,9 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ChunkRecorderPresenceAddon {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("kiwi-server-replay-addons");
-
-    // Accessed only from the single server tick thread — no synchronisation needed.
+    // Accessed only from the single server tick thread — no synchronization needed.
     private int tickCounter = 0;
 
     /** Registers the server-tick callback. Call once from {@code KiwiServerReplayAddons#onInitialize()}. */
@@ -52,25 +49,35 @@ public class ChunkRecorderPresenceAddon {
 
         for (ChunkRecorder recorder : ChunkRecorders.recorders()) {
             boolean hasRealPlayer = hasRealPlayerInArea(server, recorder);
-            ChunkRecorderAccessor acc = (ChunkRecorderAccessor) recorder;
-            long lastPaused = acc.getLastPaused();
+            ChunkRecorderAccessor acc = asAccessor(recorder);
+            long lastPaused = acc.kiwiServerReplayAddons$getLastPaused();
 
             if (!hasRealPlayer && lastPaused == 0L) {
                 // No real players present — pause the recorder by recording the start time.
-                acc.setLastPaused(System.currentTimeMillis());
-                LOGGER.debug("[KiwiReplayAddons] Paused chunk recorder '{}': no real players in area",
-                        recorder.getName());
-
+                acc.kiwiServerReplayAddons$setLastPaused(System.currentTimeMillis());
+                server.getPlayerList().broadcastSystemMessage(
+                        Component.literal(String.format("Paused recording for %s", recorder.getName())), false
+                );
             } else if (hasRealPlayer && lastPaused != 0L) {
                 // A real player has entered (or is in) the area — resume by committing the
                 // elapsed pause duration and clearing the paused marker.
                 long pauseDuration = System.currentTimeMillis() - lastPaused;
-                acc.setTotalPausedTime(acc.getTotalPausedTime() + pauseDuration);
-                acc.setLastPaused(0L);
-                LOGGER.debug("[KiwiReplayAddons] Resumed chunk recorder '{}': real player entered area",
-                        recorder.getName());
+                acc.kiwiServerReplayAddons$setTotalPausedTime(acc.kiwiServerReplayAddons$getTotalPausedTime() + pauseDuration);
+                acc.kiwiServerReplayAddons$setLastPaused(0L);
+                server.getPlayerList().broadcastSystemMessage(
+                        Component.literal(String.format("Resumed recording for %s", recorder.getName())), false
+                );
             }
         }
+    }
+
+    /**
+     * {@link ChunkRecorder} is a final Kotlin class, so javac rejects a direct cast to the
+     * accessor interface as an inconvertible type. Casting through {@link Object} matches the
+     * runtime shape after Mixin applies the interface.
+     */
+    private static ChunkRecorderAccessor asAccessor(ChunkRecorder recorder) {
+        return (ChunkRecorderAccessor) (Object) recorder;
     }
 
     /**

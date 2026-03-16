@@ -22,17 +22,17 @@ public interface ChunkRecorderAccessor {
 
     /** Returns the epoch-millis timestamp at which the recorder was last paused, or {@code 0} if not paused. */
     @Accessor("lastPaused")
-    long getLastPaused();
+    long kiwiServerReplayAddons$getLastPaused();
 
     /** Sets the epoch-millis timestamp used to mark the recorder as paused ({@code 0} = not paused). */
     @Accessor("lastPaused")
-    void setLastPaused(long value);
+    void kiwiServerReplayAddons$setLastPaused(long value);
 
     /** Returns the total milliseconds already accumulated as paused time. */
     @Accessor("totalPausedTime")
-    long getTotalPausedTime();
+    long kiwiServerReplayAddons$getTotalPausedTime();
 
     /** Sets the total accumulated paused time in milliseconds. */
     @Accessor("totalPausedTime")
-    void setTotalPausedTime(long value);
+    void kiwiServerReplayAddons$setTotalPausedTime(long value);
 }
