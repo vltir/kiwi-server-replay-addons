@@ -1,5 +1,6 @@
-package com.vltir.replay;
+package com.vltir.replay.addons;
 
+import com.vltir.replay.config.KiwiAddonsConfigManager;
 import com.vltir.replay.mixin.ChunkRecorderAccessor;
 import me.senseiwells.replay.chunk.ChunkRecorder;
 import me.senseiwells.replay.chunk.ChunkRecorders;
@@ -33,20 +34,16 @@ import net.minecraft.world.level.ChunkPos;
  */
 public class ChunkRecorderPresenceAddon {
 
-    // Accessed only from the single server tick thread — no synchronization needed.
-    private int tickCounter = 0;
-
     /** Registers the server-tick callback. Call once from {@code KiwiServerReplayAddons#onInitialize()}. */
     public void register() {
+        if (!KiwiAddonsConfigManager.get().pauseUnvisitedChunks) return;
         ServerTickEvents.END_SERVER_TICK.register(this::onServerTick);
     }
 
     private void onServerTick(MinecraftServer server) {
-        if (++tickCounter < 20) {
+        if (server.getTickCount() % 20 == 0) {
             return;
         }
-        tickCounter = 0;
-
         for (ChunkRecorder recorder : ChunkRecorders.recorders()) {
             boolean hasRealPlayer = hasRealPlayerInArea(server, recorder);
             ChunkRecorderAccessor acc = asAccessor(recorder);

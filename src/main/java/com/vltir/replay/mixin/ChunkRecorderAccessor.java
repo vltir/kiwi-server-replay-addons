@@ -1,12 +1,13 @@
 package com.vltir.replay.mixin;
 
+import com.vltir.replay.addons.ChunkRecorderPresenceAddon;
 import me.senseiwells.replay.chunk.ChunkRecorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
  * Exposes the private timestamp-tracking fields of {@link ChunkRecorder} so that
- * {@link com.vltir.replay.ChunkRecorderPresenceAddon} can implement its own
+ * {@link ChunkRecorderPresenceAddon} can implement its own
  * pause/resume logic (skip recording time when no real players are in the area).
  *
  * <p>The underlying mechanism in {@code ChunkRecorder} tracks paused time via two fields:</p>
