@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "kiwi-server-replay-addons",
+  "version": "${version}",
+  "name": "Kiwi Server Replay Addons",
+  "description": "Additional Features for the Server Replay Mod",
+  "authors": ["vltir"],
+  "contact": {
+    "homepage": "https://github.com/vltir/kiwi-server-replay-addons"
+  },
+  "license": "MIT",
+  "icon": "assets/kiwi-server-replay-addons/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.vltir.replay.KiwiServerReplayAddons"
+    ]
+  },
+  "mixins": [
+    "kiwi-server-replay-addons.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
