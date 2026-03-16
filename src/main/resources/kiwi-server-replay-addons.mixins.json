@@ -4,6 +4,7 @@
   "package": "com.vltir.replay.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ChunkRecorderAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

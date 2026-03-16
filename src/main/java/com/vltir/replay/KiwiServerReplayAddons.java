@@ -6,5 +6,6 @@ public class KiwiServerReplayAddons implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        new ChunkRecorderPresenceAddon().register();
     }
 }
